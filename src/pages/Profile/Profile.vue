@@ -7,7 +7,7 @@
           <i class="iconfont icon-geren1 icon_person"></i>
         </div>
         <div class="user_info">
-          <p class="user-info-top">登录/注册</p>
+          <p class="user-info-top">{{userInfo.name || "登录/注册"}}</p>
           <p>
             <span class="user_icon">
               <i class="iconfont icon-shouji icon_modile"></i>
@@ -67,7 +67,7 @@
           <i class="iconfont icon-huiyuanquanyi"></i>
         </span>
         <div class="my_order_div">
-          <span>硅谷外卖会员卡</span>
+          <span>易点外卖会员卡</span>
           <span class="my_order_icon">
             <i class="iconfont icon-jiantouyou"></i>
           </span>
@@ -88,12 +88,31 @@
         </div>
       </a>
     </section>
+    <mt-button type="danger" style="width: 100%" v-if="userInfo._id" @click="logout">退出登录</mt-button>
   </div>
 </template>
 
 <script>
-  import HeaderTop from '../../components/HeaderTop/HeaderTop'
+  import { mapState } from 'Vuex';
+  import { MessageBox,Toast } from 'mint-ui'
+  import HeaderTop from '../../components/HeaderTop/HeaderTop';
   export default {
+    computed: {
+      ...mapState(['userInfo'])
+    },
+    methods: {
+      logout() {
+        MessageBox.confirm('确认退出吗?').then(
+          action => {
+          this.$store.dispatch('logout')
+          Toast("退出完成")
+          },
+          action => {
+          Toast("已取消退出")
+          }
+        );
+      }
+    },
     components: {
         HeaderTop
     }

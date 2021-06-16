@@ -2,12 +2,18 @@
   <div class="msite">
     <!-- 首页头部 -->
     <HeaderTop :title="address.name">
-      <a class="header_search" slot="left">
+      <router-link class="header_search" slot="left" to="/search">
         <i class="iconfont icon-sousuo"></i>
-      </a>
-      <a class="header_login_reg" slot="right">
-        <span class="login_reg_text">登录|注册</span>
-      </a>
+      </router-link>
+
+      <router-link class="header_login_reg" slot="right" :to="userInfo._id ? '/userInfo' : '/login'">
+        <span class="login_reg_text" v-if="!userInfo._id">
+          登录|注册
+        </span>
+        <span class="login_reg_text" v-else>
+          <i class="iconfont icon-geren1"></i>
+        </span>
+      </router-link>
     </HeaderTop>
     <!-- 首页面导航 -->
     <nav class="msite_nav">
@@ -52,12 +58,15 @@ import ShopList from "../../components/ShopList/ShopList.vue";
 // 引入Swiper组件
 import Swiper from "swiper";
 import "swiper/dist/css/swiper.min.css";
+
 import { mapState } from "Vuex";
+ 
 
 export default {
   data() {
     return {
       baseImageUrl: "https://fuss10.elemecdn.com",
+      //url:"http://localhost:8080/#/profile"
     };
   },
   mounted() {
@@ -66,7 +75,7 @@ export default {
   },
 
   computed: {
-    ...mapState(["address", "categorys"]),
+    ...mapState(["address", "categorys","userInfo"]),
 
     /*
     
@@ -121,7 +130,6 @@ export default {
 
 <style lang="stylus" rel="stylesheet/style">
 @import '../../common/stylus/mixins.styl';
-
 .msite {
   width: 100%;
   margin-bottom: 45px;

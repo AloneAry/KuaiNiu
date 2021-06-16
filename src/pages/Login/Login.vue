@@ -2,7 +2,7 @@
   <div class="loginContainer">
     <div class="loginInner">
       <div class="login_header">
-        <h2 class="login_logo">硅谷配送</h2>
+        <h2 class="login_logo">点点配送</h2>
         <div class="login_header_title">
           <a
             href="javascript:;"
@@ -48,7 +48,7 @@
               />
             </section>
             <section class="login_hint">
-              温馨提示：未注册硅谷外卖账号的手机号，登录时将自动注册，且代表已同意
+              温馨提示：未注册易点外卖账号的手机号，登录时将自动注册，且代表已同意
               <a href="javascript:;">《用户服务协议》</a>
             </section>
           </div>
@@ -102,7 +102,7 @@
               </section>
             </section>
           </div>
-          <button class="login_submit">登录</button>
+          <button class="login_submit" @click="login">登录</button>
         </form>
         <a href="javascript:;" class="about_us">关于我们</a>
       </div>
@@ -120,97 +120,126 @@
 
 <script>
 import AlertTip from "../../components/AlertTip/AlertTip.vue";
-import {reqPwdLogin, reqSendCode, reqSmsLogin} from "../../api"
+import { reqPwdLogin, reqSendCode, reqSmsLogin } from "../../api";
 export default {
   data() {
     return {
+      
       loginWay: true, //true短信登录，flase验证码登录
       phone: "", //手机号
       computedTime: 0, //计时的时间
       showPwd: false, //选择是否显示密码
       name: "", //用户名验证
       pwd: "", //密码验证
-      right: "",
       code: "", //短信验证码
       captcha: "", //图像验证码
       alertText: "", //提示文本
       showAlert: false, // 是否显示警告框
+      // rightPhone: "",// 手机号格式验证
     };
   },
 
   computed: {
     rightPhone() {
-      return /^1\d{10}$/.test(this.phone);
+      return /^1[3-9]\d{9}$/.test(this.phone);
     },
   },
 
   methods: {
     // 异步获取短信验证码
     async getCode() {
-
       if (!this.computedTime) {
-      this.computedTime = 30;
-      // 创建定时器
-      const intervalId = setInterval(() => {
-        // 如果计时器大于零进行倒计时
-        // 启动循环定时器，每隔1s减少1
-        if (this.computedTime <= 0) {
-          clearInterval(intervalId);
-        }
-        this.computedTime--;
+        this.computedTime = 30;
+        // 创建定时器
+        const intervalId = setInterval(() => {
+          // 如果计时器大于零进行倒计时
+          // 启动循环定时器，每隔1s减少1
+          if (this.computedTime <= 0) {
+            clearInterval(intervalId);
+          }
+          this.computedTime--;
 
-        // 如果到时，停止倒计时
-        if (this.computedTime===0) {
-          clearInterval(this.intervalId)
-        }
-      }, 1000);
-      // 发送ajax请求（请求后台指向指定手机号发验证码短信）
-      // 发送短信验证码
-      let result = await reqSendCode(this.phone)
-      if(result.code === 1) {
-        // 显示提示框
-        this.showAlert = true
-        this.alertText = result.msg
-        // 停止倒计时
-        if(this.computedTime) {
-          this.computedTime=0
-          clearInterval(this.intervalId)
+          // 如果到时，停止倒计时
+          if (this.computedTime === 0) {
+            clearInterval(this.intervalId);
+          }
+        }, 1000);
+        // 发送ajax请求（请求后台指向指定手机号发验证码短信）
+        // 发送短信验证码
+        let result = await reqSendCode(this.phone);
+        if (result.code === 1) {
+          // 显示提示框
+          this.showAlert = true;
+          this.alertText = result.msg;
+          // 停止倒计时
+          if (this.computedTime) {
+            this.computedTime = 0;
+            clearInterval(this.intervalId);
+            this.intervalId = undefined;
+          }
         }
       }
-    }
-  },
+    },
 
     showAlerts(alertText) {
       this.showAlert = true;
       this.alertText = alertText;
     },
     // 异步登录
-    login() {
+    async login() {
+      let result;
       // 前台表单验证
       if (this.loginWay) {
         // 短信登录
-        const { rightPhone, phone, code } = this;
+        const {phone, code } = this;
         // 验证手机号格式是否正确
         if (!this.rightPhone) {
           // alert('手机号格式不正确')
           this.showAlerts("手机号格式不正确");
+          return;
         } else if (!/^\d{6}$/.test(code)) {
           // 验证码必须为6位数字
           this.showAlerts("验证码不正确");
+          return;
         }
+        // 发送ajax请求 短信登录
+        result = await reqSmsLogin(phone, code);
       } else {
         // 密码登录
-        const { name, pwd, capcha } = this;
+        const { name, pwd, captcha } = this;
         if (!this.name) {
           // 用户必须指定
           this.showAlerts("用户必须指定");
+          return;
         } else if (!this.pwd) {
           // 密码必须指定
           this.showAlerts("密码必须指定");
-        } else if (!this.capcha) {
+          return;
+        } else if (!this.captcha) {
           // 验证码必须指定
           this.showAlerts("验证码不正确");
+          return;
         }
+        // 发送ajax请求 密码登录
+        result = await reqPwdLogin({name, pwd, captcha});
+      }
+
+      // 停止计时
+      if (this.computedTime) {
+        this.computedTime = 0;
+        clearInterval(this.intervalId);
+        this.intervalId = undefined;
+      }
+      // 根据结果数据处理
+      if (result.code === 0) {
+        const user = result.data;
+        // 将user保存到vuex的state
+        this.$store.dispatch('recordUser',user)
+        // 去个人中心界面
+        this.$router.replace("/msite");
+      } else {
+        const msg = result.msg;
+        this.showAlerts(msg);
       }
     },
 
@@ -221,8 +250,8 @@ export default {
 
     getCapcha(event) {
       // 每次指定的src值要不同
-      event.target.src = "http://localhost:4000/captcha?time="+Date.now()
-    }
+      event.target.src = "http://localhost:4000/captcha?time=" + Date.now();
+    },
   },
 
   components: {

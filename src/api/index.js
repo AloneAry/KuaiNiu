@@ -17,7 +17,7 @@ export const reqCategorys = () => ajax(`${BASE_URL}/index_category`)
 /**
  * 获取msite商铺列表（根据经纬度）
  */
-export const reqShops = ({latitude, longitude}) => ajax('/api/shops', {latitude, longitude})
+export const reqShops = ({latitude, longitude}) => ajax(BASE_URL+'/shops', {latitude, longitude})
 
 /**
  *账号密码登录 
@@ -31,7 +31,7 @@ export const reqPwdLogin = ({name, pwd, captcha}) => ajax(BASE_URL+'/login_pwd',
 /**
  *获取短信验证码
  */ 
-export const reqSendCode = (phone, code) => (BASE_URL+'/login_sms',{phone, code},"POST")
+export const reqSendCode = (phone) => ajax(BASE_URL+'/sendcode',{phone})
 
 /**
  *手机号验证码登录 
@@ -41,15 +41,31 @@ export const reqSmsLogin = (phone,code) => ajax(BASE_URL+'/login_sms',{phone, co
 /**
  *获取用户信息 
  */ 
- export const reqUserInfo = () => ajax('/api/userinfo')
+ export const reqUserInfo = () => ajax(BASE_URL+'/userinfo')
 
 
 /**
  * 请求登出
  */ 
-export const reqLogout = () => ajax('/api/logout')
+export const reqLogout = () => ajax(BASE_URL+'/logout')
 
+/**
+ * 获取商家信息 
+ */ 
+export const reqShopInfo = () => ajax('/info') 
+/**
+ *  获取商家评价数组 
+ */ 
+ export const reqShopRatings = () => ajax('/ratings') 
+ /**
+  *  获取商家商品数组 
+  */ 
+ export const reqShopGoods = () => ajax('/goods')
 
+/**
+ *  根据关键字搜索商铺列表
+ */
+export const reqSearchShop = (geohash, keyword) => ajax(BASE_URL+'/search_shops',{geohash, keyword})
 
 
 

@@ -5,7 +5,6 @@
 </template>
 
 <script>
-
 const CLASS_ON = 'on'
 const CLASS_HALF = 'half'
 const CLASS_OFF = 'off'
@@ -20,21 +19,21 @@ export default {
     starClasses () {
       const {score} = this
       const scs = []
-    // 
-    const scoreInteger = Math.floor(score)
-    for (let i = 0; i < scoreInteger; i++) {
-      scs.push(CLASS_ON)     
-    }
+      // 
+      const scoreInteger = Math.floor(score)
+      for (let i = 0; i < scoreInteger; i++) {
+        scs.push(CLASS_ON)     
+      }
 
-    if (score-scoreInteger>=.5) {
-      scs.push(CLASS_HALF)
-    }
+      if (score-scoreInteger>=.5) {
+        scs.push(CLASS_HALF)
+      }
 
-    while(scs.length<5) {
-      scs.push(CLASS_OFF)
-    }
-      return scs
-    }
+      while(scs.length<5) {
+        scs.push(CLASS_OFF)
+      }
+        return scs
+      }
   }
 };
 </script>

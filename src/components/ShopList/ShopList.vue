@@ -1,7 +1,7 @@
 <template>
       <div class="shop_container">
         <ul class="shop_list" v-if="shops.length">
-          <li class="shop_li border-1px" v-for="(shop,index) in shops" :key="index">
+          <li class="shop_li border-1px" v-for="(shop,index) in shops" :key="index" @click="$router.push('/shop')">
             <a>
               <div class="shop_left">
                 <img class="shop_img" src="https://seopic.699pic.com/photo/50170/1223.jpg_wh1200.jpg">
@@ -24,7 +24,7 @@
                     </div>
                   </section>
                   <section class="shop_rating_order_right">
-                    <span class="delivery_style delivery_left">{{shop.delivery_mode.text}}</span>
+                    <span class="delivery_style delivery_left">点点专送</span>
                     <span class="delivery_style delivery_right">准时达</span>
                   </section>
                 </section>
